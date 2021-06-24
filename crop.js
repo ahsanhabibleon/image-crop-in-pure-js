@@ -41,7 +41,7 @@ function crop(url, aspectRatio) {
 			// draw our image at position 0, 0 on the canvas
 			const ctx = outputImage.getContext('2d');
 			ctx.drawImage(inputImage, outputX, outputY);
-			var imgUrl = outputImage.toDataURL('image/png');
+			const imgUrl = outputImage.toDataURL('image/png');
 			const img = document.createElement('img');
 			img.src = `${imgUrl}`;
 			resolve(img);
