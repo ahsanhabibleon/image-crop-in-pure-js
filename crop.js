@@ -13,8 +13,12 @@ const setProperty = (id, property, value) => {
 let cropped = false;
 const cropImage = () => {
 	if (!cropped) {
+		const outputWidth = document.getElementById('output-width').value || 100;
+		const outputHeight = document.getElementById('output-height').value || 100;
+		const outputX = document.getElementById('crop-axis-x').value || 0;
+		const outputY = document.getElementById('crop-axis-y').value || 0;
 		//Arguments (imageUrl, outputWidth, outputHeight, outputX, outputY)
-		crop(imageURL, 100, 120, -100, -120).then((img) => {
+		crop(imageURL, outputWidth, outputHeight, outputX, outputY).then((img) => {
 			setProperty('img', 'src', img.src)
 		});
 		cropped = true;
