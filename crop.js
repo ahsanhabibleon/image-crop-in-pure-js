@@ -1,9 +1,42 @@
 /**
- * @param {string} url - The source image
- * @param {number} aspectRatio - The aspect ratio
- * @return {Promise<HTMLCanvasElement>} A Promise that resolves with the resulting image as a canvas element
+ * @url - Source of the image to use
+ * @aspectRatio - The aspect ratio to apply
+ * @outputX , @outputY - Should be negative numbers || 0
  */
-function crop(url, aspectRatio) {
+
+const imageURL = document.getElementById('img').src;
+
+const setProperty = (id, property, value) => {
+	return document.getElementById(id)[property] = value
+}
+
+let cropped = false;
+const cropImage = () => {
+	if (!cropped) {
+		//Arguments (imageUrl, outputWidth, outputHeight, outputX, outputY)
+		crop(imageURL, 100, 120, -100, -120).then((img) => {
+			setProperty('img', 'src', img.src)
+		});
+		cropped = true;
+		setProperty('btn', 'innerHTML', 'Revert Image')
+		setProperty('title', 'innerHTML', 'Cropped Image')
+	} else {
+		setProperty('img', 'src', imageURL)
+		setProperty('btn', 'innerHTML', 'Crop Image')
+		setProperty('title', 'innerHTML', 'Original Image')
+		cropped = false
+	}
+}
+
+// crop the source image at various aspect ratios. 
+//Arguments (imageUrl, outputWidth, outputHeight, outputX, outputY)
+const cropImg = function (url, outputWidth, outputHeight, outputX, outputY) {
+	crop(url, outputWidth, outputHeight, outputX, outputY).then((canvas) => {
+		document.body.appendChild(canvas)
+	});
+}
+
+function crop(url, outputWidth = 100, outputHeight = 100, outputX = 0, outputY = 0) {
 	return new Promise((resolve) => {
 		// this image will hold our source image data
 		const inputImage = new Image();
@@ -11,25 +44,6 @@ function crop(url, aspectRatio) {
 
 		// we want to wait for our image to load
 		inputImage.onload = () => {
-			// let's store the width and height of our image
-			const inputWidth = inputImage.naturalWidth;
-			const inputHeight = inputImage.naturalHeight;
-
-			// get the aspect ratio of the input image
-			const inputImageAspectRatio = inputWidth / inputHeight;
-
-			// if it's bigger than our target aspect ratio
-			let outputWidth = inputWidth;
-			let outputHeight = inputHeight;
-			if (inputImageAspectRatio > aspectRatio) {
-				outputWidth = inputHeight * aspectRatio;
-			} else if (inputImageAspectRatio < aspectRatio) {
-				outputHeight = inputWidth / aspectRatio;
-			}
-
-			// calculate the position to draw the image at
-			const outputX = (outputWidth - inputWidth) * 0.5;
-			const outputY = (outputHeight - inputHeight) * 0.5;
 
 			// create a canvas that will present the output image
 			const outputImage = document.createElement('canvas');
@@ -41,9 +55,13 @@ function crop(url, aspectRatio) {
 			// draw our image at position 0, 0 on the canvas
 			const ctx = outputImage.getContext('2d');
 			ctx.drawImage(inputImage, outputX, outputY);
+
+			//convert the canvas to image
 			const imgUrl = outputImage.toDataURL('image/png');
 			const img = document.createElement('img');
 			img.src = `${imgUrl}`;
+
+			//return the image
 			resolve(img);
 		};
 
@@ -51,3 +69,4 @@ function crop(url, aspectRatio) {
 		inputImage.src = url;
 	});
 }
+
